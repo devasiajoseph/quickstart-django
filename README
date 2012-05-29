@@ -1,0 +1,4 @@
+A minimal web application for quickly starting a Django 1.4 project.
+Contains basic user registration and login. User can also login via 
+facebook and twitter.
+Uses Jquery and Twitter Bootstrap for UI.

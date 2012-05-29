@@ -1,0 +1,37 @@
+{% extends "site_base.html" %}
+{% block content_body%}
+<div class="modal">
+  <div class="modal-header"><h2>Login</h2>
+    <div class="alert alert-error none" id="message___all__"></div>
+  </div>
+  <div class="modal-body">
+    <div class="control-group" id="container_username">
+      <label for="id_username">Username:</label>
+      <div class="input">
+	       {{ login_form.username }}
+	       <div id="message_username" class="help-inline"></div>
+      </div>
+    </div>
+    <div class="control-group" id="container_password">
+      <label for="id_password">Password:</label>
+      <div class="input">
+	       {{ login_form.password }}
+	     <div id="message_password" class="help-inline"></div>
+      </div>
+    </div>
+    <div>
+      Remember me on this computer {{ login_form.remember_me }}
+    </div>
+    <div>
+      Don't have an account? <a href="/register">Register</a><br/>
+      Or <br/>
+      <a href="/start/fbauth">Login via Facebook</a><br/>
+      <a href="/start/twauth">Login via Twitter</a>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a class="btn btn-large btn-primary" href="javascript:void(0)" onclick="App.User.login()">Login</a>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "site_base.html" %}
+{% block content_body%}
+<h2>Registration Success!!!</h2>
+{%if activation_email%}
+	We have sent you an email with an activation link. Please activate your account within 48 hours.
+{%else%}
+	Registration success. Please <a href="/login">Login</a>
+{%endif%}
+{% endblock %}

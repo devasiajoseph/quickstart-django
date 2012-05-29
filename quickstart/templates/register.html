@@ -1,0 +1,41 @@
+{% extends "site_base.html" %}
+{% block content_body %}
+
+<div class="form-stacked">
+  <h2>Register</h2>
+  <div class="alert alert-error none" id="message___all__"></div>
+  <div class="control-group" id="container_username">
+    <label for="id_username">Username:</label>
+    <div class="input">
+      {{ user_form.username }}
+      <div id="message_username" class="help-inline"></div>
+    </div>
+  </div>
+  <div class="control-group" id="container_password1">
+    <label for="id_password">Password:</label>
+    <div class="input">
+      {{ user_form.password1 }}
+      <div id="message_password1" class="help-inline"></div>
+    </div>
+  </div>
+  <div class="control-group" id="container_password2">
+    <label for="id_password2">Confirm Password:</label>
+    <div class="input">
+      {{ user_form.password2 }}
+      <div id="message_password2" class="help-inline"></div>
+    </div>
+  </div>
+  <div class="control-group" id="container_email">
+    <label for="id_email">Email:</label>
+    <div class="input">
+      {{ user_form.email }}
+      <div id="message_email" class="help-inline"></div>
+    </div>
+  </div>
+  <div class="control-group">
+    <a class="btn btn-large btn-primary" onclick="App.User.save_user()" id="save_button">Register</a>
+  </div>
+  {{user_form.user_id}}
+</div>
+Already have an account? <a href="/login">Login</a>
+{% endblock %}
