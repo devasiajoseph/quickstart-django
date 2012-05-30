@@ -120,6 +120,9 @@ def activate(request, activation_key):
 
 
 def start_fbauth(request):
+    """
+    Starting point for facebook authentication
+    """
     csrf_token = csrf(request)["csrf_token"]
     fbauth_dialog = settings.FBAPP_AUTH_REDIRECT % \
         {"FBAPP_ID": settings.FBAPP_ID,
@@ -129,6 +132,9 @@ def start_fbauth(request):
 
 
 def fbauth(request):
+    """
+    Redirect function after facebook authentication
+    """
     form = FacebookLoginForm(request.GET, request=request)
     if form.is_valid():
         user = form.facebook_login()
@@ -155,6 +161,9 @@ def start_twauth(request):
 
 
 def twauth(request):
+    """
+    Redirect function after twitter login
+    """
     # Instantiate Twython with the authernticated tokens
     twitter = Twython(
     twitter_token=settings.TWITTER_KEY,
