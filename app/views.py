@@ -10,10 +10,21 @@ from django.contrib.auth import logout
 from django.core.urlresolvers import reverse
 import datetime
 from django.shortcuts import get_object_or_404
-from app.models import UserProfile
+from app.models import UserProfile, FlowModel, CredentialsModel
 from django.core.context_processors import csrf
 from twython import Twython
 from app.db_utilities import third_party_login
+
+from oauth2client.django_orm import Storage
+from oauth2client.client import OAuth2WebServerFlow
+
+import requests
+
+
+def index(request):
+    print settings.SITE_URL + reverse('twauth')
+    return render_to_response("index.html",
+                              context_instance=RequestContext(request))
 
 
 def home(request):
@@ -148,9 +159,8 @@ def start_twauth(request):
     """
     # Instantiate Twython with the first leg of our trip.
     twitter = Twython(twitter_token=settings.TWITTER_KEY,
-                  twitter_secret=settings.TWITTER_SECRET,
-                  callback_url=request.build_absolute_uri(reverse('twauth'))
-                  )
+                      twitter_secret=settings.TWITTER_SECRET,
+                      callback_url=settings.SITE_URL + reverse('twauth'))
 
     # Request an authorization url to send the user to...
     auth_props = twitter.get_authentication_tokens()
@@ -178,3 +188,45 @@ def twauth(request):
             authorized_tokens["oauth_token"],
             request)
     return HttpResponseRedirect(reverse('home'))
+
+
+def start_googleauth(request):
+    """
+    Starting point for google authentication
+    uses oauth2.0
+    """
+    #storage = Storage(CredentialsModel, 'id', request.user, 'credential')
+    #credential = storage.get()
+    flow = OAuth2WebServerFlow(
+        # Visit https://code.google.com/apis/console to
+        # generate your client_id, client_secret and to
+        # register your redirect_uri.
+        client_id=settings.GOOGLE_CLIENT_ID,
+        client_secret=settings.GOOGLE_SECRET,
+        scope=['https://www.googleapis.com/auth/userinfo.profile',
+               'https://www.googleapis.com/auth/userinfo.email'],
+        user_agent=request.META["HTTP_USER_AGENT"])
+
+    callback = settings.GOOGLE_REDIRECT_URL
+    authorize_url = flow.step1_get_authorize_url(callback)
+    #f = FlowModel(id=request.user, flow=flow)
+    #f.save()
+    return HttpResponseRedirect(authorize_url)
+
+
+def googleauth(request):
+    flow = OAuth2WebServerFlow(
+        # Visit https://code.google.com/apis/console to
+        # generate your client_id, client_secret and to
+        # register your redirect_uri.
+        client_id=settings.GOOGLE_CLIENT_ID,
+        client_secret=settings.GOOGLE_SECRET,
+        scope=['https://www.googleapis.com/auth/userinfo.profile',
+               'https://www.googleapis.com/auth/userinfo.email'],
+        user_agent=request.META["HTTP_USER_AGENT"])
+    credential = flow.step2_exchange(request.REQUEST)
+    r = requests.get("https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token="+credential.access_token)
+    d = simplejson.loads(r.text)
+    print d
+    print credential
+    return HttpResponse("auhtorized")

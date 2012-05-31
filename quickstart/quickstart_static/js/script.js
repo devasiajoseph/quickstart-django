@@ -140,14 +140,14 @@ var App = {
     User:{
 	save_user:function(){
         var obj = {"value":["user_id", "username", "password1", "password2", "email"]};
-        App.submit_data(obj,{},"/add/user/", App.User.save_user_callback, "loader");
+        App.submit_data(obj,{},"/add/user", App.User.save_user_callback, "loader");
 	},
 	save_user_callback:function(data){
         $("#id_user_id").val(data["user_id"]);
 	},
 	login:function(){
         var obj = {"value":["username", "password"],"check":["remember_me"]};
-        App.submit_data(obj,{},"/login_user/", App.User.login_callback, "loader");
+        App.submit_data(obj,{},"/login_user", App.User.login_callback, "loader");
 	},
 	login_callback:function(data){
         window.location.href = data["next_view"];

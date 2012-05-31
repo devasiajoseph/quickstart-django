@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from app.utilities import send_activation_email, create_key
 from django.conf import settings
+from oauth2client.django_orm import FlowField
+from oauth2client.django_orm import CredentialsField
 
 
 class UserProfile(models.Model):
@@ -18,6 +20,16 @@ class UserProfile(models.Model):
     twitter_id = models.CharField(max_length=100)
 
 
+class FlowModel(models.Model):
+    id = models.ForeignKey(User, primary_key=True)
+    flow = FlowField()
+
+
+class CredentialsModel(models.Model):
+    id = models.ForeignKey(User, primary_key=True)
+    credential = CredentialsField()
+
+
 def create_user_profile(sender, instance, created, **kwargs):
     """
     Signal for creating a new profile and setting activation key
@@ -31,4 +43,6 @@ def create_user_profile(sender, instance, created, **kwargs):
                                    key_expires=key_object["expiry"])
 
         send_activation_email(instance.email, key_object["key"])
+
+# connect to the signal
 post_save.connect(create_user_profile, sender=User)
