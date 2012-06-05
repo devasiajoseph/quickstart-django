@@ -3,22 +3,23 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from django.shortcuts import render_to_response
-from app.forms import CreateUserForm, LoginForm, FacebookLoginForm
+from app.forms import CreateUserForm, LoginForm
 from app.utilities import reply_object
 import simplejson
 from django.contrib.auth import logout
 from django.core.urlresolvers import reverse
 import datetime
 from django.shortcuts import get_object_or_404
-from app.models import UserProfile, FlowModel, CredentialsModel
+from app.models import UserProfile, SocialAuth
 from django.core.context_processors import csrf
 from twython import Twython
 from app.db_utilities import third_party_login
 
-from oauth2client.django_orm import Storage
 from oauth2client.client import OAuth2WebServerFlow
 
 import requests
+import re
+from app.facebooksdk import Facebook
 
 
 def index(request):
@@ -134,59 +135,36 @@ def start_fbauth(request):
     """
     Starting point for facebook authentication
     """
-    csrf_token = csrf(request)["csrf_token"]
-    fbauth_dialog = settings.FBAPP_AUTH_REDIRECT % \
-        {"FBAPP_ID": settings.FBAPP_ID,
-         "FBAPP_REDIRECT_URI": settings.FBAPP_REDIRECT_URI,
-         "CSRF_TOKEN": csrf_token}
-    return HttpResponseRedirect(fbauth_dialog)
+    social_auth = SocialAuth(request=request)
+    redirect_url = social_auth.facebook_step1()
+    return HttpResponseRedirect(redirect_url)
 
 
 def fbauth(request):
     """
     Redirect function after facebook authentication
     """
-    form = FacebookLoginForm(request.GET, request=request)
-    if form.is_valid():
-        user = form.facebook_login()
+    social_auth = SocialAuth(request=request)
+    social_auth.facebook_step2()
     return HttpResponseRedirect(reverse('home'))
 
 
 def start_twauth(request):
     """
         The view function that initiates the entire handshake.
-        For the most part, this is 100% drag and drop.
     """
-    # Instantiate Twython with the first leg of our trip.
-    twitter = Twython(twitter_token=settings.TWITTER_KEY,
-                      twitter_secret=settings.TWITTER_SECRET,
-                      callback_url=settings.SITE_URL + reverse('twauth'))
-
-    # Request an authorization url to send the user to...
-    auth_props = twitter.get_authentication_tokens()
-
-    # Then send them over there, durh.
-    request.session['request_token'] = auth_props
-    return HttpResponseRedirect(auth_props['auth_url'])
+    social_auth = SocialAuth(request=request)
+    redirect_url = social_auth.twitter_step1()
+    return HttpResponseRedirect(redirect_url)
 
 
 def twauth(request):
     """
     Redirect function after twitter login
     """
-    # Instantiate Twython with the authernticated tokens
-    twitter = Twython(
-    twitter_token=settings.TWITTER_KEY,
-    twitter_secret=settings.TWITTER_SECRET,
-    oauth_token=request.session['request_token']['oauth_token'],
-    oauth_token_secret=request.session['request_token']['oauth_token_secret'],
-    )
 
-    # Retrieve the tokens we want...
-    authorized_tokens = twitter.get_authorized_tokens()
-    user = third_party_login("twitter_" + authorized_tokens["screen_name"],
-            authorized_tokens["oauth_token"],
-            request)
+    social_auth = SocialAuth(request=request)
+    social_auth.twitter_step2()
     return HttpResponseRedirect(reverse('home'))
 
 
@@ -195,38 +173,12 @@ def start_googleauth(request):
     Starting point for google authentication
     uses oauth2.0
     """
-    #storage = Storage(CredentialsModel, 'id', request.user, 'credential')
-    #credential = storage.get()
-    flow = OAuth2WebServerFlow(
-        # Visit https://code.google.com/apis/console to
-        # generate your client_id, client_secret and to
-        # register your redirect_uri.
-        client_id=settings.GOOGLE_CLIENT_ID,
-        client_secret=settings.GOOGLE_SECRET,
-        scope=['https://www.googleapis.com/auth/userinfo.profile',
-               'https://www.googleapis.com/auth/userinfo.email'],
-        user_agent=request.META["HTTP_USER_AGENT"])
-
-    callback = settings.GOOGLE_REDIRECT_URL
-    authorize_url = flow.step1_get_authorize_url(callback)
-    #f = FlowModel(id=request.user, flow=flow)
-    #f.save()
-    return HttpResponseRedirect(authorize_url)
+    social_auth = SocialAuth(request=request)
+    redirect_url = social_auth.google_step1()
+    return HttpResponseRedirect(redirect_url)
 
 
 def googleauth(request):
-    flow = OAuth2WebServerFlow(
-        # Visit https://code.google.com/apis/console to
-        # generate your client_id, client_secret and to
-        # register your redirect_uri.
-        client_id=settings.GOOGLE_CLIENT_ID,
-        client_secret=settings.GOOGLE_SECRET,
-        scope=['https://www.googleapis.com/auth/userinfo.profile',
-               'https://www.googleapis.com/auth/userinfo.email'],
-        user_agent=request.META["HTTP_USER_AGENT"])
-    credential = flow.step2_exchange(request.REQUEST)
-    r = requests.get("https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token="+credential.access_token)
-    d = simplejson.loads(r.text)
-    print d
-    print credential
-    return HttpResponse("auhtorized")
+    social_auth = SocialAuth(request=request)
+    social_auth.google_step2()
+    return HttpResponseRedirect(reverse('home'))

@@ -8,15 +8,15 @@ from django.conf import settings
 """
     Users: https://graph.facebook.com/btaylor (Bret Taylor)
     Pages: https://graph.facebook.com/cocacola (Coca-Cola page)
-    Events: https://graph.facebook.com/251906384206 (Facebook Developer Garage Austin)
-    Groups: https://graph.facebook.com/195466193802264 (Facebook Developers group)
+    Events: https://graph.facebook.com/251906384206 (EventID)
+    Groups: https://graph.facebook.com/195466193802264
     Applications: https://graph.facebook.com/2439131959 (the Graffiti app)
-    Status messages: https://graph.facebook.com/367501354973 (A status message from Bret)
-    Photos: https://graph.facebook.com/98423808305 (A photo from the Coca-Cola page)
-    Photo albums: https://graph.facebook.com/99394368305 (Coca-Cola's wall photos)
-    Profile pictures: http://graph.facebook.com/devasiajoseph/picture (your profile picture)
-    Videos: https://graph.facebook.com/817129783203 (A Facebook tech talk on Graph API)
-    Notes: https://graph.facebook.com/122788341354 (Note announcing Facebook for iPhone 3.0)
+    Status messages: https://graph.facebook.com/367501354973
+    Photos: https://graph.facebook.com/98423808305
+    Photo albums: https://graph.facebook.com/99394368305
+    Profile pictures: http://graph.facebook.com/devasiajoseph/picture
+    Videos: https://graph.facebook.com/817129783203
+    Notes: https://graph.facebook.com/122788341354
     Checkins: https://graph.facebook.com/414866888308 (Check-in at a pizzeria)
 
     Friends: https://graph.facebook.com/me/friends?access_token=...
@@ -31,7 +31,7 @@ from django.conf import settings
     Photo Tags: https://graph.facebook.com/me/photos?access_token=...
     Photo Albums: https://graph.facebook.com/me/albums?access_token=...
     Video Tags: https://graph.facebook.com/me/videos?access_token=...
-    Video Uploads: https://graph.facebook.com/me/videos/uploaded?access_token=...
+    Video Uploads: https://graph.facebook.com/me/videos/uploaded?access_token=
     Events: https://graph.facebook.com/me/events?access_token=...
     Groups: https://graph.facebook.com/me/groups?access_token=...
     Checkins: https://graph.facebook.com/me/checkins?access_token=...
@@ -69,9 +69,9 @@ class Facebook(object):
 
     def user_info(self, method='GET', param=''):
         if method == 'GET':
-            r = requests.get\
-            ('https://graph.facebook.com/me/%s?access_token=%s' %\
-                (param, self.access_token))
+            r = requests.get(
+                'https://graph.facebook.com/me/%s?access_token=%s' % (
+                    param, self.access_token))
             data = json.loads(r.text)
         return data
 
@@ -93,7 +93,9 @@ class Facebook(object):
             data = json.loads(self.base64_url_decode(payload))
 
             expected_sig = hmac.new(
-                self.app_secret, msg=payload, digestmod=hashlib.sha256).digest()
+                self.app_secret,
+                msg=payload,
+                digestmod=hashlib.sha256).digest()
 
             # allow the signed_request to function for upto 1 day
             if sig == expected_sig and \
@@ -112,25 +114,8 @@ class Facebook(object):
         return data
 
     def wall_post(self, message):
-        r = requests.post('https://graph.facebook.com/%s/feed'%self.user_id, data = {"access_token": self.access_token,
-                                                                                 "message": message})
+        r = requests.post(
+            'https://graph.facebook.com/%s/feed' % self.user_id,
+            data={"access_token": self.access_token,
+                  "message": message})
         print r.text
-"""
-    def api(self, path, params=None, method=u'GET', domain=u'graph'):
-    #Make API calls
-        if not params:
-            params = {}
-        params[u'method'] = method
-        if u'access_token' not in params and self.access_token:
-            params[u'access_token'] = self.access_token
-        result = json.loads(urlfetch.fetch(
-            url=u'https://' + domain + u'.facebook.com' + path,
-            payload=urllib.urlencode(params),
-            method=urlfetch.POST,
-            headers={
-                u'Content-Type': u'application/x-www-form-urlencoded'})
-            .content)
-        if isinstance(result, dict) and u'error' in result:
-            raise FacebookApiError(result)
-        return result
-"""

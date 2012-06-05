@@ -182,6 +182,7 @@ class FacebookLoginForm(forms.Form):
         facebook = Facebook()
         facebook.access_token = access_token
         facebook_user = facebook.user_info()
+        print facebook_user
         user = third_party_login("facebook_" + facebook_user["username"],
             access_token,
             self.request)
