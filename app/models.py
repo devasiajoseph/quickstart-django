@@ -136,11 +136,11 @@ class SocialAuth(object):
         facebook_profile = logged_in_user.get_profile()
         facebook_profile.first_name = fb_user["first_name"]
         facebook_profile.last_name = fb_user["last_name"]
-        facebook_profile.home_town = fb_user["home_town"]["name"]
+        facebook_profile.home_town = fb_user["hometown"]["name"]
         facebook_profile.location = fb_user["location"]["name"]
         facebook_profile.gender = fb_user["gender"]
-        facebook_profile.facebook_username = facebook_user["username"]
-        facebook_profile.facebook_id = facebook_user["id"]
+        facebook_profile.facebook_username = fb_user["username"]
+        facebook_profile.facebook_id = fb_user["id"]
         facebook_profile.save()
         return True
 
