@@ -207,15 +207,34 @@ FBAPP_SECRET = ""
 FBAPP_REDIRECT_URI = "http://yoursite/fbauth"
 
 
+FBAPP_AUTH_REDIRECT = "https://www.facebook.com/dialog/oauth?\
+client_id=%(FBAPP_ID)s&\
+redirect_uri=%(FBAPP_REDIRECT_URI)s&\
+&state=%(CSRF_TOKEN)s"
+
+FBAPP_ACCESS_TOKEN_URL = "https://graph.facebook.com/oauth/access_token?\
+client_id=%(FBAPP_ID)s\
+&redirect_uri=%(FBAPP_REDIRECT_URI)s&\
+client_secret=%(FBAPP_SECRET)s&\
+code=%(FB_CODE)s"
+
+TWITTER_KEY = ''
+TWITTER_SECRET = ''
+
+GOOGLE_AUTH_REDIRECT = "https://accounts.google.com/o/oauth2/auth?redirect_uri=https://localhost/oauth2callback&response_type=code&client_id=56279468910.apps.googleusercontent.com&approval_prompt=force&scope=https://Fwww.googleapis.com/Fauth/blogger&access_type=offline"
+
+GOOGLE_SECRET = ""
+GOOGLE_CLIENT_ID = ""
+
 if LOCALHOST:
     SITE_URL = "http://localhost:8000"
     DATABASES = {
       'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',  # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '',                      # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': '',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
         'PORT': ''
         }
     }
@@ -237,18 +256,8 @@ if LOCALHOST:
     FBAPP_ID = ""
     FBAPP_SECRET = ""
     FBAPP_REDIRECT_URI = "http://localhost:8000/fbauth"
-
-
-FBAPP_AUTH_REDIRECT = "https://www.facebook.com/dialog/oauth?\
-client_id=%(FBAPP_ID)s&\
-redirect_uri=%(FBAPP_REDIRECT_URI)s&\
-&state=%(CSRF_TOKEN)s"
-
-FBAPP_ACCESS_TOKEN_URL = "https://graph.facebook.com/oauth/access_token?\
-client_id=%(FBAPP_ID)s\
-&redirect_uri=%(FBAPP_REDIRECT_URI)s&\
-client_secret=%(FBAPP_SECRET)s&\
-code=%(FB_CODE)s"
-
-TWITTER_KEY = ''
-TWITTER_SECRET = ''
+    TWITTER_KEY = 'local key'
+    TWITTER_SECRET = 'local secret'
+    GOOGLE_SECRET = "local secret"
+    GOOGLE_CLIENT_ID = "local id"
+    GOOGLE_REDIRECT_URI = "https://localhost/oauth2callback"
