@@ -1,4 +1,5 @@
 A minimal web application for quickly starting a Django 1.4 project.
 Contains basic user registration and login. User can also login via 
-facebook and twitter.
+facebook, twitter and google accounts.
 Uses Jquery and Twitter Bootstrap for UI.
+Rename the quick_settings.py file to settings.py and add your custom settings.
