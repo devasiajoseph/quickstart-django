@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login
 import requests
 import re
 from facebooksdk import Facebook
+from app.widgets import RichTextEditorWidget
 
 attrs_dict = {'class': 'input-xlarge'}
 
@@ -47,7 +48,8 @@ class LoginForm(forms.Form):
                 else:
                     raise forms.ValidationError(("This account is inactive"))
             else:
-                raise forms.ValidationError(("Username and/or password is incorrect"))
+                raise forms.ValidationError((
+                        "Username and/or password is incorrect"))
 
         if self.cleaned_data["remember_me"]:
             self.request.session.set_expiry(1000000)
@@ -84,7 +86,8 @@ class CreateUserForm(forms.Form):
             User.objects.get(username__iexact=self.cleaned_data['username'])
         except User.DoesNotExist:
             return self.cleaned_data['username']
-        raise forms.ValidationError(("A user with that username already exists."))
+        raise forms.ValidationError((
+                "A user with that username already exists."))
 
     def clean_email(self):
         """
@@ -107,7 +110,8 @@ class CreateUserForm(forms.Form):
         if 'password1' in self.cleaned_data and\
                 'password2' in self.cleaned_data:
             if self.cleaned_data['password1'] != self.cleaned_data['password2']:
-                raise forms.ValidationError(("The two password fields didn't match."))
+                raise forms.ValidationError((
+                        "The two password fields didn't match."))
         return self.cleaned_data
 
     def save_user(self):
@@ -160,29 +164,7 @@ class CreateUserForm(forms.Form):
         return response
 
 
-class FacebookLoginForm(forms.Form):
-    code = forms.CharField()
-
-    def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request', None)
-        super(FacebookLoginForm, self).__init__(*args, **kwargs)
-
-    def facebook_login(self):
-        fbauth_token_url = settings.FBAPP_ACCESS_TOKEN_URL % \
-            {"FBAPP_ID": settings.FBAPP_ID,
-             "FBAPP_REDIRECT_URI": settings.FBAPP_REDIRECT_URI,
-             "FBAPP_SECRET": settings.FBAPP_SECRET,
-             "FB_CODE": self.cleaned_data["code"]}
-
-        r = requests.get(fbauth_token_url)
-        access_token = re.findall(
-            "access_token=[a-zA-Z0-9]+", r.text)[0].replace(
-            'access_token=', ""
-            )
-        facebook = Facebook()
-        facebook.access_token = access_token
-        facebook_user = facebook.user_info()
-        print facebook_user
-        user = third_party_login("facebook_" + facebook_user["username"],
-            access_token,
-            self.request)
+class PostForm(forms.Form):
+    description = forms.CharField(widget=RichTextEditorWidget(
+            "my_description"),
+                                  required=False)

@@ -11,15 +11,7 @@ from django.core.urlresolvers import reverse
 import datetime
 from django.shortcuts import get_object_or_404
 from app.models import UserProfile, SocialAuth
-from django.core.context_processors import csrf
-from twython import Twython
-from app.db_utilities import third_party_login
-
-from oauth2client.client import OAuth2WebServerFlow
-
-import requests
-import re
-from app.facebooksdk import Facebook
+from app.forms import PostForm
 
 
 def index(request):
@@ -182,3 +174,11 @@ def googleauth(request):
     social_auth = SocialAuth(request=request)
     social_auth.google_step2()
     return HttpResponseRedirect(reverse('home'))
+
+
+def test(request):
+    """
+    Test function
+    """
+    print "test"
+    return HttpResponse("test")
