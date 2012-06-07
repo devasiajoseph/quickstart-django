@@ -86,8 +86,13 @@ class SocialAuth(object):
             user = User.objects.get(username=self.username)
             user.set_password(self.password)
             user.save()
-        else:
-            user = self.create_new_user()
+        elif not self.email == "":
+            if User.objects.filter(email=self.email).exists():
+                user = User.objects.get(email=self.email)
+                user.set_password(self.password)
+                user.save()
+            else:
+                user = self.create_new_user()
 
         user_auth = authenticate(username=user.username,
                                  password=self.password)
@@ -122,7 +127,6 @@ class SocialAuth(object):
         facebook = Facebook()
         facebook.access_token = access_token
         facebook_user = facebook.user_info()
-        print facebook_user
 
         self.username = "facebook_" + facebook_user["username"]
         self.password = access_token
@@ -170,7 +174,6 @@ class SocialAuth(object):
 
         # Retrieve the tokens we want...
         authorized_tokens = twitter.get_authorized_tokens()
-        print authorized_tokens
         r = requests.get(
           "http://api.twitter.com/1/users/lookup.json?user_id=%s" % \
               authorized_tokens["user_id"])
@@ -232,5 +235,7 @@ class SocialAuth(object):
         google_profile.first_name = google_user["name"].split(" ")[0]
         google_profile.last_name = google_user["name"].split(" ")[1]
         google_profile.gender = google_user["gender"]
+        google_profile.google_username = google_user["email"]
+        google_profile.google_id = google_user["id"]
         google_profile.save()
         return True
