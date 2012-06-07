@@ -101,7 +101,7 @@ class SocialAuth(object):
         csrf_token = csrf(self.request)["csrf_token"]
         fbauth_dialog = settings.FBAPP_AUTH_REDIRECT % \
         {"FBAPP_ID": settings.FBAPP_ID,
-         "FBAPP_REDIRECT_URI": settings.FBAPP_REDIRECT_URI,
+         "FBAPP_REDIRECT_URI": settings.SITE_URL + reverse('fbauth'),
          "SCOPE": "email",
          "CSRF_TOKEN": csrf_token}
 
@@ -110,7 +110,7 @@ class SocialAuth(object):
     def facebook_step2(self):
         fbauth_token_url = settings.FBAPP_ACCESS_TOKEN_URL % \
             {"FBAPP_ID": settings.FBAPP_ID,
-             "FBAPP_REDIRECT_URI": settings.FBAPP_REDIRECT_URI,
+             "FBAPP_REDIRECT_URI": settings.SITE_URL + reverse('fbauth'),
              "FBAPP_SECRET": settings.FBAPP_SECRET,
              "FB_CODE": self.request.GET["code"]}
 
@@ -200,9 +200,9 @@ class SocialAuth(object):
         client_secret=settings.GOOGLE_SECRET,
         scope=['profile', 'email'],
         user_agent=self.request.META["HTTP_USER_AGENT"],
-        redirect_uri=settings.GOOGLE_REDIRECT_URI)
+        redirect_uri=settings.SITE_URL + reverse('googleauth'))
 
-        callback = settings.GOOGLE_REDIRECT_URI
+        callback = settings.SITE_URL + reverse('googleauth')
         authorize_url = flow.step1_get_authorize_url(callback)
         return authorize_url
 
@@ -215,7 +215,7 @@ class SocialAuth(object):
         client_secret=settings.GOOGLE_SECRET,
         scope=['profile', 'email'],
         user_agent=self.request.META["HTTP_USER_AGENT"],
-        redirect_uri=settings.GOOGLE_REDIRECT_URI)
+        redirect_uri=settings.SITE_URL + reverse('googleauth'))
         credential = flow.step2_exchange(self.request.REQUEST)
         r = requests.get(
         "https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token="\

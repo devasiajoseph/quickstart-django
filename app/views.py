@@ -11,7 +11,6 @@ from django.core.urlresolvers import reverse
 import datetime
 from django.shortcuts import get_object_or_404
 from app.models import UserProfile, SocialAuth
-from app.forms import PostForm
 
 
 def index(request):

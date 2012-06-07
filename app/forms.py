@@ -7,7 +7,6 @@ from django.contrib.auth import authenticate, login
 import requests
 import re
 from facebooksdk import Facebook
-from app.widgets import RichTextEditorWidget
 
 attrs_dict = {'class': 'input-xlarge'}
 
@@ -94,11 +93,11 @@ class CreateUserForm(forms.Form):
         Validate that the email is not already in use.
         """
 
-        try:
-            User.objects.get(email__iexact=self.cleaned_data['email'])
-        except User.DoesNotExist:
-            return self.cleaned_data['email']
-        raise forms.ValidationError(("This email already exists"))
+        if User.objects.filter(
+            email__iexact=self.cleaned_data['email']).exists():
+            raise forms.ValidationError(("This email already exists"))
+        else:
+            return self.self.cleaned_data['email']
 
     def clean(self):
         """
@@ -162,9 +161,3 @@ class CreateUserForm(forms.Form):
         response["code"] = settings.APP_CODE["UPDATED"]
         response["user_id"] = user.id
         return response
-
-
-class PostForm(forms.Form):
-    description = forms.CharField(widget=RichTextEditorWidget(
-            "my_description"),
-                                  required=False)
