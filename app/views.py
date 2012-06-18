@@ -14,7 +14,6 @@ from app.models import UserProfile, SocialAuth
 
 
 def index(request):
-    print settings.SITE_URL + reverse('twauth')
     return render_to_response("index.html",
                               context_instance=RequestContext(request))
 
@@ -173,6 +172,14 @@ def googleauth(request):
     social_auth = SocialAuth(request=request)
     social_auth.google_step2()
     return HttpResponseRedirect(reverse('home'))
+
+
+def password_reset(request):
+    return HttpResponse("")
+
+
+def password_reset_submit(request):
+    return HttpResponse("")
 
 
 def test(request):

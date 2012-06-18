@@ -34,6 +34,9 @@ urlpatterns = patterns('',
     url(r'^start/googleauth', 'app.views.start_googleauth',
         name='start_googleauth'),
     url(r'^oauth2callback', 'app.views.googleauth', name='googleauth'),
+    #password reset
+    url(r'^password/reset$', 'app.views.password_reset',
+        name='password_reset'),
     #test url
     url(r'^test$', 'app.views.test', name='test'),
 )

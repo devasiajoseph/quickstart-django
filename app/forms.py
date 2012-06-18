@@ -108,7 +108,8 @@ class CreateUserForm(forms.Form):
         """
         if 'password1' in self.cleaned_data and\
                 'password2' in self.cleaned_data:
-            if self.cleaned_data['password1'] != self.cleaned_data['password2']:
+            if self.cleaned_data['password1'] != self.cleaned_data[
+                'password2']:
                 raise forms.ValidationError((
                         "The two password fields didn't match."))
         return self.cleaned_data
@@ -161,3 +162,24 @@ class CreateUserForm(forms.Form):
         response["code"] = settings.APP_CODE["UPDATED"]
         response["user_id"] = user.id
         return response
+
+
+class PasswordEmailForm(forms.Form):
+    email = forms.EmailField()
+
+    def clean(self):
+        # check if email is already used with 3rd part login
+        return
+
+
+class PasswordResetForm(forms.Form):
+    """
+    Password reset form
+    """
+    password = forms.CharField()
+    confirm_password = forms.CharField()
+
+    def clean(self):
+        if self.cleaned_data["password"] != self.cleaned_data[
+            "confirm_password"]:
+            raise forms.ValidationError(("Passwords does not match"))
