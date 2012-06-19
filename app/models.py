@@ -82,6 +82,7 @@ class SocialAuth(object):
         return new_user
 
     def social_login(self):
+        print self.username
         if User.objects.filter(username=self.username).exists():
             user = User.objects.get(username=self.username)
             user.set_password(self.password)
@@ -93,6 +94,8 @@ class SocialAuth(object):
                 user.save()
             else:
                 user = self.create_new_user()
+        else:
+            user = self.create_new_user()
 
         user_auth = authenticate(username=user.username,
                                  password=self.password)
@@ -175,6 +178,7 @@ class SocialAuth(object):
 
         # Retrieve the tokens we want...
         authorized_tokens = twitter.get_authorized_tokens()
+        print authorized_tokens
         r = requests.get(
           "http://api.twitter.com/1/users/lookup.json?user_id=%s" % \
               authorized_tokens["user_id"])
