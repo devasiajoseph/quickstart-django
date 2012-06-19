@@ -145,6 +145,7 @@ class SocialAuth(object):
         facebook_profile.gender = fb_user["gender"]
         facebook_profile.facebook_username = fb_user["username"]
         facebook_profile.facebook_id = fb_user["id"]
+        facebook_profile.facebook_email = fb_user["email"]
         facebook_profile.save()
         return True
 
@@ -236,6 +237,7 @@ class SocialAuth(object):
         google_profile.last_name = google_user["name"].split(" ")[1]
         google_profile.gender = google_user["gender"]
         google_profile.google_username = google_user["email"]
+        google_profile.google_email = google_user["email"]
         google_profile.google_id = google_user["id"]
         google_profile.save()
         return True

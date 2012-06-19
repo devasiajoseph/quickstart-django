@@ -2,11 +2,14 @@ from django import forms
 from django.conf import settings
 from app.utilities import reply_object
 from app.db_utilities import create_new_user, third_party_login
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, check_password
 from django.contrib.auth import authenticate, login
 import requests
 import re
 from facebooksdk import Facebook
+from django.db.models import Q
+from app.models import UserProfile
+from app.utilities import create_key, send_password_reset_email
 
 attrs_dict = {'class': 'input-xlarge'}
 
@@ -97,7 +100,7 @@ class CreateUserForm(forms.Form):
             email__iexact=self.cleaned_data['email']).exists():
             raise forms.ValidationError(("This email already exists"))
         else:
-            return self.self.cleaned_data['email']
+            return self.cleaned_data['email']
 
     def clean(self):
         """
@@ -167,19 +170,60 @@ class CreateUserForm(forms.Form):
 class PasswordEmailForm(forms.Form):
     email = forms.EmailField()
 
-    def clean(self):
+    def clean_email(self):
+        # check if email exists
+        request_email = self.cleaned_data["email"]
+        if not User.objects.filter(email=request_email).exists():
+            raise forms.ValidationError(("This email does not exist"))
+
         # check if email is already used with 3rd part login
-        return
+        if UserProfile.objects.filter(Q(facebook_email=request_email) |\
+                                       Q(google_email=request_email)).exists():
+            raise forms.ValidationError(("This email is already used with a social account please login via social login"))
+
+        return self.cleaned_data["email"]
+
+    def send_reset_link(self):
+        response = reply_object()
+        user = User.objects.get(email=self.cleaned_data["email"])
+        if not user.is_active:
+            response["code"] = settings.APP_CODE["SERVER MESSAGE"]
+            response["server_message"] = "This account is inactive. Please contact site administrator"
+            return response
+        profile = user.get_profile()
+        key_object = create_key(user.username, 2)
+        profile.verification_key = key_object["key"]
+        profile.key_expires = key_object["expiry"]
+        send_password_reset_email(user.email, key_object["key"])
+        profile.save()
+        response["code"] = settings.APP_CODE["CALLBACK"]
+        return response
 
 
 class PasswordResetForm(forms.Form):
     """
     Password reset form
     """
-    password = forms.CharField()
-    confirm_password = forms.CharField()
+    password = forms.CharField(widget=forms.PasswordInput())
+    confirm_password = forms.CharField(widget=forms.PasswordInput())
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(PasswordResetForm, self).__init__(*args, **kwargs)
 
     def clean(self):
-        if self.cleaned_data["password"] != self.cleaned_data[
-            "confirm_password"]:
-            raise forms.ValidationError(("Passwords does not match"))
+        if 'password' in self.cleaned_data and 'confirm_password' in\
+                self.cleaned_data:
+
+            if self.cleaned_data["password"] !=\
+                    self.cleaned_data["confirm_password"]:
+                raise forms.ValidationError(("Passwords does not match"))
+        return self.cleaned_data
+
+    def save_new_password(self):
+        response = reply_object()
+        user = self.request.user
+        user.set_password(self.cleaned_data['password'])
+        user.save()
+        response["code"] = settings.APP_CODE["CALLBACK"]
+        return response

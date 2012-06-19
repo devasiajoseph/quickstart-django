@@ -7,7 +7,17 @@ from django.conf import settings
 
 def send_activation_email(email, key):
     email_subject = 'Activate your account'
-    email_body = 'Account activation Link %(site_url)sactivate/%(activation_key)s' % {"site_url": settings.SITE_URL, "activation_key": key}
+    email_body = 'Account activation Link %(site_url)s/activate/%(activation_key)s' % {"site_url": settings.SITE_URL, "activation_key": key}
+    send_mail(email_subject,
+              email_body,
+              settings.ADMIN_EMAIL,
+              [email],
+              fail_silently=False)
+
+
+def send_password_reset_email(email, key):
+    email_subject = 'Password reset'
+    email_body = 'Password Reset Link %(site_url)s/password/reset/form/%(activation_key)s' % {"site_url": settings.SITE_URL, "activation_key": key}
     send_mail(email_subject,
               email_body,
               settings.ADMIN_EMAIL,

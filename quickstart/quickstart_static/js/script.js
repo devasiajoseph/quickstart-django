@@ -61,6 +61,9 @@ var App = {
         case "data_loaded":
             callback(data);
             break;
+	case "server_message":
+            App.show_info(App.code_message[data["server_message"]]);
+            break;
         default:
             alert("unknown response");
         }
@@ -139,19 +142,35 @@ var App = {
     },
     User:{
 	save_user:function(){
-        var obj = {"value":["user_id", "username", "password1", "password2", "email"]};
-        App.submit_data(obj,{},"/add/user", App.User.save_user_callback, "loader");
+            var obj = {"value":["user_id", "username", "password1", "password2", "email"]};
+            App.submit_data(obj,{},"/add/user", App.User.save_user_callback, "loader");
 	},
 	save_user_callback:function(data){
-        $("#id_user_id").val(data["user_id"]);
+            $("#id_user_id").val(data["user_id"]);
 	},
 	login:function(){
-        var obj = {"value":["username", "password"],"check":["remember_me"]};
-        App.submit_data(obj,{},"/login_user", App.User.login_callback, "loader");
+            var obj = {"value":["username", "password"],"check":["remember_me"]};
+            App.submit_data(obj,{},"/login_user", App.User.login_callback, "loader");
 	},
 	login_callback:function(data){
-        window.location.href = data["next_view"];
-	}
+            window.location.href = data["next_view"];
+	},
+	password_reset_email:function(){
+	    var obj = {"value":["email"]};
+            App.submit_data(obj,{},"/password/reset/submit/email", App.User.password_reset_email_callback, "loader");
+	},
+	password_reset_email_callback:function(data){
+	    $("#email_form").hide();
+	    $("#email_sent").show();
+	},
+	password_reset_password:function(data){
+	    var obj = {"value":["password","confirm_password"]};
+            App.submit_data(obj,{},"/password/reset/submit/password", App.User.password_reset_password_callback, "loader");
+	},
+	password_reset_password_callback:function(data){
+	    location.href=data["redirect"];
+	},
+	
     }
     
 };
