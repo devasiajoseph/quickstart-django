@@ -1,0 +1,11 @@
+<html>
+  <head>
+    <script>
+      var response_data = {{response_data|safe}};
+      parent.App.hide_loader("loader");
+      parent.App.process_data(response_data, false, false);
+    </script>
+    {%block script%}
+    {%endblock%}
+  </head>
+</html>

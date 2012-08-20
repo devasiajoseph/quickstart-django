@@ -34,6 +34,22 @@ var App = {
             App.process_data(data, callback);
         });
     },
+    submit_data_iframe:function(form, obj, loader_id){
+	$("#message___all__").hide();
+	App.hide_error();
+	App.hide_info();
+	App.hide_warning();
+        App.show_loader("Submitting", loader_id);
+	for(var i in obj["value"]){
+            $("#message_"+ obj["value"][i]).html("");
+            $("#container_"+ obj["value"][i]).removeClass("error");
+        }
+        for(var j in obj["check"]){
+            $("#message_"+ obj["value"][i]).html("");
+            $("#container_"+ obj["value"][i]).removeClass("error");
+        }
+	$("#"+form).submit();
+    },
 
     process_data : function(data_str, callback){
         data = JSON.parse(data_str);
