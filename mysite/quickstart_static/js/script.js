@@ -169,7 +169,7 @@ var App = {
 	},
 	password_reset_password_callback:function(data){
 	    location.href=data["redirect"];
-	},
+	}
 	
     }
     

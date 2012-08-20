@@ -1,7 +1,6 @@
 from django import forms
 from django.conf import settings
 from app.utilities import reply_object
-from app.db_utilities import create_new_user, third_party_login
 from django.contrib.auth.models import User, check_password
 from django.contrib.auth import authenticate, login
 import requests
