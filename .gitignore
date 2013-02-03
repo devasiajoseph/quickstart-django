@@ -37,5 +37,4 @@ test_debug.py
 *_flymake.py
 venv/
 settings.py
-secret_settings.py
 /bkp
