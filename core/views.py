@@ -3,14 +3,14 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from django.shortcuts import render_to_response, get_object_or_404
-from app.forms import CreateUserForm, LoginForm, PasswordEmailForm
-from app.utilities import reply_object, create_key
+from core.forms import CreateUserForm, LoginForm, PasswordEmailForm, \
+    PasswordResetForm
+from core.utilities import reply_object, create_key
 import simplejson
 from django.contrib.auth import logout
 from django.core.urlresolvers import reverse
 import datetime
-from app.models import UserProfile, SocialAuth
-from app.forms import PasswordResetForm, PasswordEmailForm
+from core.models import UserProfile, SocialAuth
 from django.contrib.auth import authenticate, login
 
 

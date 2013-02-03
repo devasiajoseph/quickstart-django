@@ -1,14 +1,14 @@
 from django import forms
 from django.conf import settings
-from app.utilities import reply_object
+from core.utilities import reply_object
 from django.contrib.auth.models import User, check_password
 from django.contrib.auth import authenticate, login
 import requests
 import re
 from facebooksdk import Facebook
 from django.db.models import Q
-from app.models import UserProfile
-from app.utilities import create_key, send_password_reset_email
+from core.models import UserProfile
+from core.utilities import create_key, send_password_reset_email
 
 attrs_dict = {'class': 'input-xlarge'}
 

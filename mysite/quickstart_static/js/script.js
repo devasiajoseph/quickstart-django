@@ -29,10 +29,29 @@ var App = {
             }
         }
         submit_obj["csrfmiddlewaretoken"] = $('input[name="csrfmiddlewaretoken"]')[0].value;
-        $.post(url, submit_obj, function(data){
+	$.post(url, submit_obj, function(data){
             App.hide_loader(loader_id);
             App.process_data(data, callback);
-        });
+        }).error(function(xhr){
+	    App.hide_loader(loader_id);
+	    App.handle_ajax_error(xhr);
+	});
+    },
+    handle_ajax_error:function(xhr){
+	switch (xhr.status){
+	    case 404:
+	    App.show_error("Requested function not found");
+	    break;
+	    case 403:
+	    App.show_error("You don't have access to perform this action");
+	    break;
+	    case 500:
+	    App.show_error("A system error has occured.");
+	    break;
+	    default:
+	    App.show_error("Error!!!");
+	};
+
     },
     submit_data_iframe:function(form, obj, loader_id){
 	$("#message___all__").hide();
@@ -116,18 +135,31 @@ var App = {
             $("#id_" + key).val(dict[key]);
         }
     },
-    show_loader:function(loader_message, loader_id){
-        if(loader_id != "None"){
-            if (loader_message!="None"){
-                $("#"+loader_id).html(loader_message);
-            }
-            $("#" + loader_id).show();
-        }
+    currentLoader:0,
+    currentLoaderId:"null",
+    show_loader:function(loader_id, message){
+	i = 0;
+	App.currentLoaderId = loader_id;
+	App.currentLoader = setInterval(function() {
+	    i = ++i % 10;
+	    $("#"+loader_id).html(message+Array(i+1).join("."));
+	}, 500);
+	
     },
-    hide_loader:function(loader_id){
-        if(loader_id != "None"){
-            $("#" + loader_id).hide();
-        }
+    hide_loader:function(){
+	clearInterval(App.currentLoader);
+	$("#"+App.currentLoaderId).html($("#"+App.currentLoaderId).data('text'));
+    },
+    showButtonLoader:function(loader_id, message){
+	$("#"+loader_id).addClass('disabled');
+	App.showLoader(loader_id, message);
+    },
+    hideButtonLoader:function(){
+	$("#"+App.currentLoaderId).removeClass('disabled');
+	App.hideLoader();
+    },
+    submitForm:function(e){
+	App.showButtonLoader(e.target.id, "Submitting");
     },
     show_info:function(info_message){
         $("#info").html(info_message);

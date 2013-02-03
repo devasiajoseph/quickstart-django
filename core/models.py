@@ -1,10 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
-from app.utilities import send_activation_email, create_key
+from core.utilities import send_activation_email, create_key
 from django.conf import settings
 from django.core.context_processors import csrf
-from app.facebooksdk import Facebook
+from core.facebooksdk import Facebook
 import requests
 import re
 from django.contrib.auth import authenticate, login

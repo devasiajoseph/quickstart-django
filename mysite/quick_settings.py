@@ -141,7 +141,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app'
+    'core'
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -195,7 +195,6 @@ APP_PASSWORD = "password"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 ADMIN_EMAIL = "admin@site.com"
 SITE_URL = "http://yoursiteurl"
-AUTH_PROFILE_MODULE = 'app.UserProfile'
 EMAIL_USE_TLS = True  # True for gmail testing
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = ''
